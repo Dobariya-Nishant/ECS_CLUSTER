@@ -1,6 +1,7 @@
 locals {
   post_fix                    = "${var.resource_name}-${var.environment}"
   ecs_cluster_name = "${local.post_fix}"
+  capacity_provider_name = "${local.post_fix}"
   common_tags = {
     Project     = var.project_name
     Environment = var.environment
@@ -20,6 +21,11 @@ variable "resource_name" {
 variable "environment" {
   type        = string
   description = "Deployment environment (e.g., dev, staging, prod)."
+}
+
+variable "aws_autoscaling_groups" {
+  type        = list(string)
+  description = ""
 }
 
 variable "loadbalancer_sg_id" {
