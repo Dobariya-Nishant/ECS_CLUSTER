@@ -1,18 +1,18 @@
 resource "aws_ecs_capacity_provider" "providers" {
-  count = length(var.aws_autoscaling_groups)
+  count = length(var.auto_scaling_groups)
 
   name = "${local.capacity_provider_name}-${count.index}"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn   = var.aws_autoscaling_groups[count.index].arn
-    managed_termination_protection = "ENABLED"
-    managed_draining = "ENABLED"
+    auto_scaling_group_arn         = var.auto_scaling_groups[count.index]
+    managed_termination_protection = "DISABLED"
+    managed_draining               = "DISABLED"
 
     managed_scaling {
       maximum_scaling_step_size = 10
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 80
+      target_capacity           = 90
     }
   }
 

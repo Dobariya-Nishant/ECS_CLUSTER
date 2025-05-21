@@ -1,10 +1,20 @@
 locals {
-  post_fix                    = "${var.resource_name}-${var.environment}"
-  ecs_cluster_name = "${local.post_fix}"
-  capacity_provider_name = "${local.post_fix}"
+  post_fix               = "${var.resource_name}-${var.environment}"
+  ecs_cluster_name       = local.post_fix
+  capacity_provider_name = local.post_fix
+
   common_tags = {
     Project     = var.project_name
     Environment = var.environment
+  }
+}
+
+variable "provider_type" {
+  type        = string
+  description = "Choose between: ec2, fargate, fargate-spot, combine"
+  validation {
+    condition     = contains(["ec2", "fargate", "fargate-spot", "combine"], var.provider_type)
+    error_message = "Invalid provider_type. Must be one of: ec2, fargate, fargate-spot, combine."
   }
 }
 
@@ -23,23 +33,8 @@ variable "environment" {
   description = "Deployment environment (e.g., dev, staging, prod)."
 }
 
-variable "aws_autoscaling_groups" {
+variable "auto_scaling_groups" {
   type        = list(string)
   description = ""
 }
-
-variable "loadbalancer_sg_id" {
-  type        = string
-  default     = null
-  description = "Security group ID for the load balancer. Required when public access is disabled or no public subnets are defined."
-  validation {
-    condition = (
-      !(var.enable_public_access == false) || (var.loadbalancer_sg_id != null)
-    )
-    error_message = "When public access is disabled or no public subnets are defined, 'loadbalancer_sg_id' must be provided."
-  }
-}
-
-
-
 
