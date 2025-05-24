@@ -1,6 +1,6 @@
 locals {
-  post_fix         = "${var.resource_name}-${var.environment}"
-  ecs_cluster_name = local.post_fix
+  pre_fix         = "${var.resource_name}-${var.environment}"
+  ecs_cluster_name = local.pre_fix
 
   common_tags = {
     Project     = var.project_name
