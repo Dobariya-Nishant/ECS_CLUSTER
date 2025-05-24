@@ -1,15 +1,15 @@
-resource "aws_ecs_cluster_capacity_providers" "combine-all" {
+resource "aws_ecs_cluster_capacity_providers" "combine" {
   count = var.provider_type == "combine" ? 1 : 0
 
   cluster_name = aws_ecs_cluster.cluster.name
 
   capacity_providers = concat(
     ["FARGATE", "FARGATE_SPOT"],
-    aws_ecs_capacity_provider.providers[*].name
+    aws_ecs_capacity_provider.ec2[*].name
   )
 
   dynamic "default_capacity_provider_strategy" {
-    for_each = aws_ecs_capacity_provider.providers
+    for_each = aws_ecs_capacity_provider.ec2
 
     content {
       capacity_provider = default_capacity_provider_strategy.value["name"]
@@ -36,10 +36,10 @@ resource "aws_ecs_cluster_capacity_providers" "ec2" {
 
   cluster_name = aws_ecs_cluster.cluster.name
 
-  capacity_providers = aws_ecs_capacity_provider.providers[*].name
+  capacity_providers = aws_ecs_capacity_provider.ec2[*].name
 
   dynamic "default_capacity_provider_strategy" {
-    for_each = aws_ecs_capacity_provider.providers
+    for_each = aws_ecs_capacity_provider.ec2
 
     content {
       capacity_provider = default_capacity_provider_strategy.value["name"]
@@ -50,7 +50,7 @@ resource "aws_ecs_cluster_capacity_providers" "ec2" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "fargate-spot" {
-  for_each = var.provider_type == "fargate-spot" ? { 0 = 1 } : {}
+  count = var.provider_type == "fargate-spot" ? 1 : 0
 
   cluster_name = aws_ecs_cluster.cluster.name
 
@@ -69,7 +69,7 @@ resource "aws_ecs_cluster_capacity_providers" "fargate-spot" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "fargate" {
-  for_each = var.provider_type == "fargate" ? { 0 = 1 } : {}
+  count = var.provider_type == "fargate" ? 1 : 0
 
   cluster_name = aws_ecs_cluster.cluster.name
 

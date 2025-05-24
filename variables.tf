@@ -1,7 +1,6 @@
 locals {
-  post_fix               = "${var.resource_name}-${var.environment}"
-  ecs_cluster_name       = local.post_fix
-  capacity_provider_name = local.post_fix
+  post_fix         = "${var.resource_name}-${var.environment}"
+  ecs_cluster_name = local.post_fix
 
   common_tags = {
     Project     = var.project_name
@@ -21,6 +20,16 @@ variable "provider_type" {
 variable "project_name" {
   type        = string
   description = "Name of the overall project. Used for naming and tagging resources."
+}
+
+variable "enable_managed_draining" {
+  type    = bool
+  default = false
+}
+
+variable "enable_managed_termination_protection" {
+  type    = bool
+  default = false
 }
 
 variable "resource_name" {
