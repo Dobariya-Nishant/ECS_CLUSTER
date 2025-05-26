@@ -1,7 +1,7 @@
 resource "aws_ecs_capacity_provider" "ec2" {
   count = length(var.auto_scaling_groups)
 
-  name = "${split("/", var.auto_scaling_groups[count.index])[1]}-${local.ecs_cluster_name}"
+  name = "${local.ecs_cluster_name}-${count.index}"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = var.auto_scaling_groups[count.index]

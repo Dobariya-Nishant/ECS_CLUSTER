@@ -1,5 +1,5 @@
 output "name" {
-  value = aws_ecs_cluster.cluster.name
+  value = local.ecs_cluster_name
 }
 
 output "id" {
