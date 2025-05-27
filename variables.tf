@@ -54,6 +54,10 @@ variable "project_name" {
   description = "Name of the overall project. Used for naming and tagging resources."
 }
 
+variable "vpc_id" {
+   type        = string
+}
+
 variable "enable_managed_draining" {
   type    = bool
   default = false

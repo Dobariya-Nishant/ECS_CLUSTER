@@ -2,6 +2,7 @@ resource "aws_security_group" "task_sg" {
   count       = length(var.tasks)
   name        = var.tasks[count.index].name
   description = "Security Group"
+  vpc_id = var.vpc_id
 
   dynamic "ingress" {
     for_each = var.tasks[count.index].enable_public_access == true && var.tasks[count.index].enable_http == true ? [1] : []
