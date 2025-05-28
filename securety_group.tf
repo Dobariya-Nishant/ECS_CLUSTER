@@ -1,11 +1,12 @@
 resource "aws_security_group" "task_sg" {
-  count       = length(var.tasks)
+  count = length(var.tasks)
+
   name        = var.tasks[count.index].name
   description = "Security Group"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   dynamic "ingress" {
-    for_each = var.tasks[count.index].enable_public_access == true && var.tasks[count.index].enable_http == true ? [1] : []
+    for_each = var.tasks[count.index].enable_public_http == true ? [1] : []
     content {
       from_port   = 80
       to_port     = 80
@@ -16,7 +17,7 @@ resource "aws_security_group" "task_sg" {
   }
 
   dynamic "ingress" {
-    for_each = var.tasks[count.index].enable_public_access == true && var.tasks[count.index].enable_https == true ? [1] : []
+    for_each = var.tasks[count.index].enable_public_https == true ? [1] : []
     content {
       from_port   = 443
       to_port     = 443
@@ -27,24 +28,13 @@ resource "aws_security_group" "task_sg" {
   }
 
   dynamic "ingress" {
-    for_each = try(var.tasks[count.index].lb_sg_id != null && var.tasks[count.index].enable_http == true, false) ? [1] : []
+    for_each = var.tasks[count.index].load_balancer_config != null ? var.tasks[count.index].load_balancer_config : []
     content {
-      from_port       = 80
-      to_port         = 80
+      from_port       = ingress.value["container_port"]
+      to_port         = ingress.value["container_port"]
       protocol        = "tcp"
-      security_groups = [var.tasks[count.index].lb_sg_id]
-      description     = "Allow HTTP from LB SG"
-    }
-  }
-
-  dynamic "ingress" {
-    for_each = try(var.tasks[count.index].lb_sg_id != null && var.tasks[count.index].enable_https == true, false) ? [1] : []
-    content {
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
-      security_groups = [var.tasks[count.index].lb_sg_id]
-      description     = "Allow HTTPS from LB SG"
+      security_groups = [ingress.value["sg_id"]]
+      description     = "load balancer security group"
     }
   }
 

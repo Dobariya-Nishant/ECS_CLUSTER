@@ -1,6 +1,6 @@
 resource "aws_ecs_service" "service" {
-  count           = length(aws_ecs_task_definition.tasks)
-  launch_type = "EC2"
+  count = length(aws_ecs_task_definition.tasks)
+
   name            = "${var.tasks[count.index].name}-service"
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.tasks[count.index].arn
@@ -18,11 +18,11 @@ resource "aws_ecs_service" "service" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.tasks[count.index].lb_target_group_arn != null && var.tasks[count.index].container_port != null ? [1] : []
+    for_each = var.tasks[count.index].load_balancer_config != null ? var.tasks[count.index].load_balancer_config : []
     content {
-      target_group_arn = var.tasks[count.index].lb_target_group_arn
+      target_group_arn = load_balancer.value["target_group_arn"]
       container_name   = var.tasks[count.index].name
-      container_port   = var.tasks[count.index].container_port
+      container_port   = load_balancer.value["container_port"]
     }
   }
 }
