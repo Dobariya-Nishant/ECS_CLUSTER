@@ -25,4 +25,11 @@ resource "aws_ecs_service" "service" {
       container_port   = load_balancer.value["container_port"]
     }
   }
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${var.tasks[count.index].name}-service"
+    }
+  )
 }

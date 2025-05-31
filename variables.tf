@@ -1,9 +1,6 @@
 locals {
-  pre_fix                      = "${var.resource_name}-${var.environment}" # Prefix used for naming all resources consistently
+  pre_fix                      = "${var.name}-${var.environment}" # Prefix used for naming all resources consistently
   ecs_cluster_name             = local.pre_fix                             # ECS cluster name
-  ecs_service_role_name        = "${local.pre_fix}-service-role"           # Name for ECS service IAM role
-  ecs_task_execution_role_name = "${local.pre_fix}-task-execution-role"    # Name for ECS task execution IAM role
-  sg_name                      = "${local.pre_fix}-sg"                     # Security group name
 
   common_tags = {
     Project     = var.project_name # Project name for tagging
@@ -35,6 +32,7 @@ variable "tasks" {
     enable_public_http  = optional(bool)   # Enable HTTP routing (e.g., via ALB listener rule)
     enable_public_https = optional(bool)   # Enable HTTPS routing (e.g., via ALB + ACM cert)
     subnet_ids          = list(string)     # List of subnet IDs to launch tasks into
+    command             = optional(list(string))
     load_balancer_config = optional(list(object({
       sg_id            = string
       target_group_arn = string
@@ -75,7 +73,18 @@ variable "enable_managed_termination_protection" {
   description = "Enable termination protection for EC2-based ECS instances managed by capacity providers."
 }
 
-variable "resource_name" {
+variable "enable_managed_scaling" {
+  type        = bool
+  default     = false
+  description = "Enable termination protection for EC2-based ECS instances managed by capacity providers."
+}
+
+variable "enable_target_tracking_scaling" {
+  type = bool
+  default = false
+}
+
+variable "name" {
   type        = string
   description = "Base name used to identify resources (e.g., prefix for ECS cluster, roles, SG, etc.)."
 }

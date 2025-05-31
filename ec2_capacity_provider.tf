@@ -9,10 +9,10 @@ resource "aws_ecs_capacity_provider" "ec2" {
     managed_draining               = var.enable_managed_draining == true ? "ENABLED" : "DISABLED"
 
     managed_scaling {
-      maximum_scaling_step_size = 1
+      maximum_scaling_step_size = 2
       minimum_scaling_step_size = 1
-      status                    = "ENABLED"
-      target_capacity           = 90
+      status                    = var.enable_managed_scaling == true ? "ENABLED" : "DISABLED"
+      target_capacity           = 80
     }
   }
 

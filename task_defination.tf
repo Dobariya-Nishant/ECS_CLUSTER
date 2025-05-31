@@ -16,6 +16,7 @@ resource "aws_ecs_task_definition" "tasks" {
       essential    = var.tasks[count.index].essential
       environment  = lookup(var.tasks[count.index], "environment", [])
       portMappings = lookup(var.tasks[count.index], "portMappings", [])
+      command      = var.tasks[count.index].command
     }
   ])
 }

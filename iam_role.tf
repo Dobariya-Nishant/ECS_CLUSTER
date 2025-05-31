@@ -1,7 +1,7 @@
 resource "aws_iam_role" "ecs_task_execution_role" {
   count = var.tasks != null ? 1 : 0
 
-  name               = local.ecs_task_execution_role_name
+  name               = "${local.pre_fix}-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
 }
 

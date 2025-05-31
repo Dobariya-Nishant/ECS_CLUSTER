@@ -14,7 +14,7 @@ resource "aws_ecs_cluster_capacity_providers" "combine" {
     content {
       capacity_provider = default_capacity_provider_strategy.value["name"]
       weight            = 2
-      base              = 1
+      base              = 0
     }
   }
 

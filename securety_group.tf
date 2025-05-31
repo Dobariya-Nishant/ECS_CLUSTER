@@ -1,7 +1,7 @@
 resource "aws_security_group" "task_sg" {
   count = length(var.tasks)
 
-  name        = var.tasks[count.index].name
+  name        = "${var.tasks[count.index].name}-sg"
   description = "Security Group"
   vpc_id      = var.vpc_id
 
@@ -49,7 +49,7 @@ resource "aws_security_group" "task_sg" {
   tags = merge(
     local.common_tags,
     {
-      Name = var.tasks[count.index].name
+      Name = "${var.tasks[count.index].name}-sg"
     }
   )
 }
