@@ -1,16 +1,16 @@
 locals {
-  pre_fix                      = "${var.name}-${var.environment}" # Prefix used for naming all resources consistently
-  ecs_cluster_name             = local.pre_fix                             # ECS cluster name
+  pre_fix          = "${var.name}-${var.environment}" // Prefix for naming all resources consistently
+  ecs_cluster_name = local.pre_fix                    // ECS cluster name
 
   common_tags = {
-    Project     = var.project_name # Project name for tagging
-    Environment = var.environment  # Environment name for tagging (e.g., dev, prod)
+    Project     = var.project_name // Project name tag
+    Environment = var.environment  // Environment tag (e.g., dev, prod)
   }
 }
 
 variable "provider_type" {
   type        = string
-  description = "Type of ECS launch method to use. Options: 'ec2', 'fargate', 'fargate-spot', or 'combine' for mixed capacity providers."
+  description = "ECS launch type to use. Options: 'ec2', 'fargate', 'fargate-spot', or 'combine' (for mixed capacity)."
   validation {
     condition     = contains(["ec2", "fargate", "fargate-spot", "combine"], var.provider_type)
     error_message = "Invalid provider_type. Must be one of: ec2, fargate, fargate-spot, combine."
@@ -18,84 +18,85 @@ variable "provider_type" {
 }
 
 variable "tasks" {
-  description = "List of ECS task definitions. Each task defines an ECS service configuration."
+  description = "List of ECS task configurations. Each item defines one ECS service."
   type = list(object({
-    name                = string           # Name of the ECS task/service
-    image_uri           = string           # Container image URI to run (e.g., ECR or Docker Hub)
-    essential           = optional(bool)   # Whether this container is essential to the task
-    lb_target_group_arn = optional(string) # ARN of the target group for ALB/NLB, if load balanced
-    lb_sg_id            = optional(string) # Security Group ID used for ALB/NLB access
-    container_port      = optional(number) # Port exposed by the container (used in ALB target group)
-    task_role_arn       = optional(string) # IAM role the task should assume
-    cpu                 = optional(number) # CPU units reserved for the container
-    memory              = optional(number) # Memory (in MiB) reserved for the container
-    enable_public_http  = optional(bool)   # Enable HTTP routing (e.g., via ALB listener rule)
-    enable_public_https = optional(bool)   # Enable HTTPS routing (e.g., via ALB + ACM cert)
-    subnet_ids          = list(string)     # List of subnet IDs to launch tasks into
-    command             = optional(list(string))
+    name                = string                 // ECS service/task name
+    image_uri           = string                 // Container image URI (ECR or Docker Hub)
+    essential           = optional(bool)         // Whether the container is essential
+    lb_target_group_arn = optional(string)       // Target group ARN (for load-balanced services)
+    lb_sg_id            = optional(string)       // SG ID used by ALB/NLB
+    container_port      = optional(number)       // Port exposed by the container
+    task_role_arn       = optional(string)       // IAM role for the task
+    cpu                 = optional(number)       // CPU units reserved
+    memory              = optional(number)       // Memory in MiB
+    enable_public_http  = optional(bool)         // Enable HTTP routing 
+    enable_public_https = optional(bool)         // Enable HTTPS routing 
+    subnet_ids          = list(string)           // Subnets to launch tasks in
+    command             = optional(list(string)) // Custom entrypoint command
     load_balancer_config = optional(list(object({
-      sg_id            = string
-      target_group_arn = string
-      container_port   = number
+      sg_id            = string // SG used for load balancer
+      target_group_arn = string // Target group ARN
+      container_port   = number // Port for container registration
     })))
     environment = optional(list(object({
-      name  = string # Env var name
-      value = string # Env var value
-    })))             # List of environment variables for the container
+      name  = string // Environment variable name
+      value = string // Environment variable value
+    })))
     portMappings = optional(list(object({
-      containerPort = number # Port exposed by container
-      hostPort      = number # Port exposed on host (for EC2 only)
-    })))                     # List of container-host port mappings
-    desired_count = number   # Number of desired ECS task replicas
+      containerPort = number // Port exposed by container
+      hostPort      = number // Host port (used only with EC2 launch type)
+    })))
+    desired_count = number // Number of ECS task replicas
   }))
   default = []
 }
 
 variable "project_name" {
   type        = string
-  description = "Name of the overall project. Used for tagging and logical grouping of resources."
+  description = "Project name used for tagging and resource grouping."
 }
 
 variable "vpc_id" {
   type        = string
-  description = "VPC ID where ECS services and networking resources will be deployed."
+  description = "VPC ID to deploy ECS tasks and networking resources into."
 }
 
 variable "enable_managed_draining" {
   type        = bool
   default     = false
-  description = "Enable managed draining for ECS capacity providers (recommended for EC2)."
+  description = "Enable managed instance draining (recommended for EC2 capacity providers)."
 }
 
 variable "enable_managed_termination_protection" {
   type        = bool
   default     = false
-  description = "Enable termination protection for EC2-based ECS instances managed by capacity providers."
+  description = "Protect EC2 instances from termination (only for EC2 capacity providers)."
 }
 
 variable "enable_managed_scaling" {
   type        = bool
   default     = false
-  description = "Enable termination protection for EC2-based ECS instances managed by capacity providers."
+  description = "Enable managed scaling for EC2 Auto Scaling Groups used by ECS."
 }
 
 variable "enable_target_tracking_scaling" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "Enable target tracking scaling policy for ECS services."
 }
 
 variable "name" {
   type        = string
-  description = "Base name used to identify resources (e.g., prefix for ECS cluster, roles, SG, etc.)."
+  description = "Base name used to prefix resource names (e.g., ECS cluster, roles, SGs)."
 }
 
 variable "environment" {
   type        = string
-  description = "Deployment environment name (e.g., dev, staging, prod). Used for naming and tagging."
+  description = "Deployment environment (e.g., dev, staging, prod). Used for naming and tagging."
 }
 
 variable "auto_scaling_groups" {
   type        = list(string)
   default     = []
-  description = "List of Auto Scaling Group ARNs to be used for EC2-based ECS capacity providers."
+  description = "List of Auto Scaling Group ARNs for EC2 capacity providers."
 }
