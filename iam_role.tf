@@ -3,6 +3,13 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 
   name               = "${local.pre_fix}-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.pre_fix}-task-execution-role"
+    }
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {

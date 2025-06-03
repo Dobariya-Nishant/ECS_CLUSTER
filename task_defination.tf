@@ -19,4 +19,11 @@ resource "aws_ecs_task_definition" "tasks" {
       command      = var.tasks[count.index].command
     }
   ])
+
+  tags = merge(
+    local.common_tags,
+    {
+      Name = var.tasks[count.index].name
+    }
+  )
 }
